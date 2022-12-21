@@ -1,0 +1,74 @@
+:root {
+    --content-height: 87%;
+    --content-width-large: 80%;
+    --content-width-medium: 19%;
+    --content-width-small: 9%;
+}
+
+body {
+    background: black;
+    font-family: "Roboto", sans-serif;
+    color: white;
+}
+
+.tableRowSmall {
+    height: 20px;
+}
+
+.tableRowLarge {
+    height: var(--content-height);
+}
+
+.tableColSmall {
+    width: var(--content-width-medium);
+}
+
+.tableColLarge {
+    width: var(--content-width-large);
+}
+
+#conversation {
+    width: 100%;
+    height: 96%;
+}
+
+#login {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -100px;
+    text-align: center;
+}
+
+#chatBox {
+    height: 100%;
+    width: 100%;
+    float: left;
+}
+
+#response {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+#text {
+    width: var(--content-width-large);
+}
+
+#sendMessage {
+    width: var(--content-width-small);
+    text-align: center;
+}
+
+#disconnect {
+    width: var(--content-width-small);
+}
+
+#userlist {
+    overflow-y: scroll;
+    height: 100%;
+    width: 100%;
+    float: right;
+}
+
