@@ -16,7 +16,7 @@ public class Program {
 
     public static void main(String[] args) throws IOException, ExecutionException, TimeoutException {
         if (args.length != 2)
-            args = new String[]{"https://en.wikipedia.org/wiki/Oscar_da_Silva", "https://en.wikipedia.org/wiki/Adolf_Hitler"};
+            args = new String[]{"https://en.wikipedia.org/wiki/Base64", "https://en.wikipedia.org/wiki/Spain"};
         if (args.length != 2)
             throw new RuntimeException("Invalid argument count; expected 2 arguments: start and target");
         debug = Debug.isDebug();
@@ -44,17 +44,17 @@ public class Program {
 
             var yield = new CompletableFuture<ResultQuery>();
             var query = new ResultQuery(start);
-            findResult$async$rec(target, start, query, yield, executor);
+            findResult$async$rec(target, start, query, yield);
 
             yield.thenRun(executor::shutdownNow);
-            return yield.get(5, TimeUnit.MINUTES);
+            return yield.get(30, TimeUnit.MINUTES);
         } catch (IOException | InterruptedException e) {
             handle(e);
             return null;
         }
     }
 
-    private static void findResult$async$rec(URL target, URL here, ResultQuery query, CompletableFuture<ResultQuery> yield, ExecutorService executor) throws IOException, InterruptedException {
+    private static void findResult$async$rec(URL target, URL here, ResultQuery query, CompletableFuture<ResultQuery> yield) throws IOException, InterruptedException {
         var content = Jsoup.parse(here, (int) TimeUnit.SECONDS.toMillis(20)).getElementById("mw-content-text");
         if (content == null)
             return;
@@ -70,20 +70,28 @@ public class Program {
                 continue;
             if (target.getPath().equals(linkPath))
                 yield.complete(myQuery);
-            else if (!checked.add(linkPath)) {
-                Thread.sleep(100);
-                executor.submit(() -> {
+            else if (addPath(linkPath)) {
+                new Thread(new ThreadGroup(link.getPath()), () -> {
                     try {
-                        findResult$async$rec(target, link, myQuery, yield, executor);
+                        findResult$async$rec(target, link, myQuery, yield);
                     } catch (IOException | InterruptedException e) {
                         handle(e);
                     }
-                });
+                }).start();
             } else if (debug && checked.contains(linkPath)) {
                 System.out.println("The following query has yielded no result:");
                 myQuery.printQuery();
-            }
+            }// else yield.completeExceptionally(new RuntimeException("No result"));
         }
+    }
+
+    private static boolean addPath(String linkPath) {
+        if (checked.add(linkPath)) {
+            if (debug)
+                System.out.println(Thread.currentThread().getThreadGroup().getName() + ": Checking " + linkPath);
+            return true;
+        }
+        return false;
     }
 
     private static void handle(Throwable t) {
