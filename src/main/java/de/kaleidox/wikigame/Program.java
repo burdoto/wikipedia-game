@@ -72,6 +72,7 @@ public class Program {
             if (target.getPath().equals(linkPath))
                 yield.complete(myQuery);
             else if (addPath(linkPath)) {
+                Thread.sleep(50);
                 new Thread(new ThreadGroup(link.getPath()), () -> {
                     try {
                         findResult$async$rec(target, link, myQuery, yield);
