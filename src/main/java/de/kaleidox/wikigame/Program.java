@@ -24,20 +24,10 @@ public class Program {
         var start = new URL(args[0]);
         var target = new URL(args[1]);
 
-        var result = run(start, target);
-        if (result == null) {
-            System.out.println("Article not found: " + target);
-            return;
-        }
-
-        if (result != null) {
-            System.out.println("Search Result:");
-            result.printQuery();
-            System.exit(0);
-        } else System.out.println("No solution found.");
+        run(start, target);
     }
 
-    private static @Nullable ResultQuery run(URL start, URL target) throws ExecutionException, TimeoutException {
+    private static void run(URL start, URL target) throws ExecutionException, TimeoutException {
         try {
             var executor = Executors.newFixedThreadPool(16);
             checked.add(start.getPath());
@@ -46,11 +36,22 @@ public class Program {
             var query = new ResultQuery(start);
             findResult$async$rec(target, start, query, yield);
 
-            yield.thenRun(executor::shutdownNow);
-            return yield.get(30, TimeUnit.MINUTES);
+            yield.thenAccept((result -> {
+                executor.shutdownNow();
+
+                if (result == null) {
+                    System.out.println("Article not found: " + target);
+                    return;
+                }
+
+                System.out.println("Search Result:");
+                result.printQuery();
+
+                System.exit(0);
+            }));
+            yield.get(30, TimeUnit.MINUTES);
         } catch (IOException | InterruptedException e) {
             handle(e);
-            return null;
         }
     }
 
