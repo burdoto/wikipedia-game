@@ -96,7 +96,8 @@ public class Program {
     }
 
     private static void handle(Throwable t) {
-        t.printStackTrace();
+        if (debug)
+            t.printStackTrace();
     }
 
     private static class ResultQuery {
