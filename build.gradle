@@ -17,9 +17,6 @@ dependencies {
     implementation 'org.jetbrains:annotations:20.1.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.11.0'
 
-    implementation 'org.comroid:restless:0.+'
-    runtimeOnly 'com.squareup.okhttp3:okhttp:4.5.0'
-    runtimeOnly 'com.alibaba:fastjson:1.2.71'
-
+    implementation 'org.comroid:api:0.+'
     implementation 'org.jsoup:jsoup:1.15.3'
 }
